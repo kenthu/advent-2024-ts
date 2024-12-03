@@ -22,16 +22,44 @@ const isRowSafe = (row: number[]): boolean => {
   return true;
 };
 
-const sumOfSafeReports = (filename: string): number => {
+const isRowSafeEnough = (row: number[]): boolean => {
+  if (isRowSafe(row)) {
+    return true;
+  }
+
+  // Try removing each level
+  for (let i = 0; i < row.length; i++) {
+    const testRow = [...row];
+    testRow.splice(i, 1);
+    if (isRowSafe(testRow)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+const numOfSafeReports = (
+  filename: string,
+  checkFn: (row: number[]) => boolean
+): number => {
   const rows = processInput(filename);
 
-  return rows.filter((row) => isRowSafe(row)).length;
+  return rows.filter((row) => checkFn(row)).length;
 };
 
 // Part 1 test
-console.log(sumOfSafeReports("src/day02/test-input.txt"));
+console.log(numOfSafeReports("src/day02/test-input.txt", isRowSafe));
 // 11
 
 // Part 1
-console.log(sumOfSafeReports("src/day02/input.txt"));
+console.log(numOfSafeReports("src/day02/input.txt", isRowSafe));
 // 326
+
+// Part 2 test
+console.log(numOfSafeReports("src/day02/test-input.txt", isRowSafeEnough));
+// 4
+
+// Part 2
+console.log(numOfSafeReports("src/day02/input.txt", isRowSafeEnough));
+// 381
