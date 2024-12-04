@@ -1,10 +1,20 @@
 import { readLines } from "lib/input";
 
+const DIRECTIONS = [
+  { rowIncrement: 0, colIncrement: 1 },
+  { rowIncrement: 1, colIncrement: 1 },
+  { rowIncrement: 1, colIncrement: 0 },
+  { rowIncrement: 1, colIncrement: -1 },
+  { rowIncrement: 0, colIncrement: -1 },
+  { rowIncrement: -1, colIncrement: -1 },
+  { rowIncrement: -1, colIncrement: 0 },
+  { rowIncrement: -1, colIncrement: 1 },
+];
+
 const findXmas = (filename: string): number => {
   const rows = readLines(filename);
   const grid = rows.map((row) => row.split(""));
 
-  // Could do recursion, but since it's always in a straight line, can just hardcode all the searches
   let count = 0;
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[0].length; col++) {
@@ -12,76 +22,14 @@ const findXmas = (filename: string): number => {
         continue;
       }
 
-      // Direction: →
-      if (
-        grid[row]?.[col + 1] === "M" &&
-        grid[row]?.[col + 2] === "A" &&
-        grid[row]?.[col + 3] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ↘
-      if (
-        grid[row + 1]?.[col + 1] === "M" &&
-        grid[row + 2]?.[col + 2] === "A" &&
-        grid[row + 3]?.[col + 3] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ↓
-      if (
-        grid[row + 1]?.[col] === "M" &&
-        grid[row + 2]?.[col] === "A" &&
-        grid[row + 3]?.[col] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ↙
-      if (
-        grid[row + 1]?.[col - 1] === "M" &&
-        grid[row + 2]?.[col - 2] === "A" &&
-        grid[row + 3]?.[col - 3] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ←
-      if (
-        grid[row]?.[col - 1] === "M" &&
-        grid[row]?.[col - 2] === "A" &&
-        grid[row]?.[col - 3] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ↖
-      if (
-        grid[row - 1]?.[col - 1] === "M" &&
-        grid[row - 2]?.[col - 2] === "A" &&
-        grid[row - 3]?.[col - 3] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ↑
-      if (
-        grid[row - 1]?.[col] === "M" &&
-        grid[row - 2]?.[col] === "A" &&
-        grid[row - 3]?.[col] === "S"
-      ) {
-        count++;
-      }
-
-      // Direction: ↗
-      if (
-        grid[row - 1]?.[col + 1] === "M" &&
-        grid[row - 2]?.[col + 2] === "A" &&
-        grid[row - 3]?.[col + 3] === "S"
-      ) {
-        count++;
+      for (const { rowIncrement, colIncrement } of DIRECTIONS) {
+        if (
+          grid[row + rowIncrement * 1]?.[col + colIncrement * 1] === "M" &&
+          grid[row + rowIncrement * 2]?.[col + colIncrement * 2] === "A" &&
+          grid[row + rowIncrement * 3]?.[col + colIncrement * 3] === "S"
+        ) {
+          count++;
+        }
       }
     }
   }
