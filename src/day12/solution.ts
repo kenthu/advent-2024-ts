@@ -1,3 +1,5 @@
+import { groupBy, sum } from "lodash";
+
 import { createGrid } from "lib/grid";
 import { readGrid } from "lib/input";
 
@@ -120,6 +122,77 @@ const part1 = (filename: string): number => {
   return price;
 };
 
+const countRegionSides = (region: Region, regionGrid: RegionGrid): number => {
+  const plotsWithTopBorder: Plot[] = [];
+  const plotsWithBottomBorder: Plot[] = [];
+  const plotsWithLeftBorder: Plot[] = [];
+  const plotsWithRightBorder: Plot[] = [];
+
+  for (const plot of region.plots) {
+    const topNeighbor = { row: plot.row - 1, col: plot.col };
+    if (regionGrid[topNeighbor.row]?.[topNeighbor.col] !== region) {
+      plotsWithTopBorder.push(plot);
+    }
+
+    const bottomNeighbor = { row: plot.row + 1, col: plot.col };
+    if (regionGrid[bottomNeighbor.row]?.[bottomNeighbor.col] !== region) {
+      plotsWithBottomBorder.push(plot);
+    }
+
+    const leftNeighbor = { row: plot.row, col: plot.col - 1 };
+    if (regionGrid[leftNeighbor.row]?.[leftNeighbor.col] !== region) {
+      plotsWithLeftBorder.push(plot);
+    }
+
+    const rightNeighbor = { row: plot.row, col: plot.col + 1 };
+    if (regionGrid[rightNeighbor.row]?.[rightNeighbor.col] !== region) {
+      plotsWithRightBorder.push(plot);
+    }
+  }
+
+  let numSides = 0;
+
+  // First, group all plots with a top border by row. For each row, count the
+  // sides by finding the first column for each side
+  for (const plots of Object.values(groupBy(plotsWithTopBorder, "row"))) {
+    const cols = plots.map((plot) => plot.col);
+    const colsSet = new Set(cols);
+    numSides += cols.filter((col) => !colsSet.has(col - 1)).length;
+  }
+
+  for (const plots of Object.values(groupBy(plotsWithBottomBorder, "row"))) {
+    const cols = plots.map((plot) => plot.col);
+    const colsSet = new Set(cols);
+    numSides += cols.filter((col) => !colsSet.has(col - 1)).length;
+  }
+
+  for (const plots of Object.values(groupBy(plotsWithLeftBorder, "col"))) {
+    const rows = plots.map((plot) => plot.row);
+    const rowsSet = new Set(rows);
+    numSides += rows.filter((row) => !rowsSet.has(row - 1)).length;
+  }
+
+  for (const plots of Object.values(groupBy(plotsWithRightBorder, "col"))) {
+    const rows = plots.map((plot) => plot.row);
+    const rowsSet = new Set(rows);
+    numSides += rows.filter((row) => !rowsSet.has(row - 1)).length;
+  }
+
+  return numSides;
+};
+
+const part2 = (filename: string): number => {
+  const { regionGrid, regions } = processInput(filename);
+
+  return sum(
+    regions.map((region) => {
+      const area = region.plots.length;
+      const numSides = countRegionSides(region, regionGrid);
+      return area * numSides;
+    })
+  );
+};
+
 // Part 1 test
 console.log(part1("src/day12/test-input.txt"));
 // 1930
@@ -127,3 +200,11 @@ console.log(part1("src/day12/test-input.txt"));
 // Part 1
 console.log(part1("src/day12/input.txt"));
 // 1518548
+
+// Part 2 test
+console.log(part2("src/day12/test-input.txt"));
+// 1206
+
+// Part 2
+console.log(part2("src/day12/input.txt"));
+// 909564
