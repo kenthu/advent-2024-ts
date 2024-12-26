@@ -7,3 +7,9 @@ export function createGrid<T>(
     Array(numCols).fill(initialValue)
   );
 }
+
+export const printGrid = (grid: string[][]): void => {
+  for (const row of grid) {
+    console.log(row.join(""));
+  }
+};
